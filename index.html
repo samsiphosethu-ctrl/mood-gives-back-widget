@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mood Gives Back</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #FFFFFF;
+  color: #1B3A2F;
+}
+.widget {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 28px 20px 32px;
+}
+.widget-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1B3A2F;
+  text-align: center;
+  margin-bottom: 6px;
+  letter-spacing: -0.3px;
+}
+.widget-sub {
+  font-size: 14px;
+  color: #7A8B82;
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.cause-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.cause-card {
+  background: #FFFFFF;
+  border: 1.5px solid rgba(27,58,47,0.15);
+  border-radius: 14px;
+  padding: 20px 10px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, transform 0.12s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.cause-card:hover { border-color: #1B3A2F; background: #F8F6F2; }
+.cause-card:active { transform: scale(0.97); }
+.cause-card.selected { border-color: #1B3A2F; background: #1B3A2F; }
+.cause-card.selected .cause-label { color: #FFFFFF; }
+.cause-card.selected .cause-sub { color: rgba(255,255,255,0.72); }
+.cause-icon { font-size: 28px; display: block; margin-bottom: 8px; line-height: 1; }
+.cause-label { font-size: 14px; font-weight: 700; color: #1B3A2F; display: block; margin-bottom: 3px; }
+.cause-sub { font-size: 11px; color: #7A8B82; display: block; line-height: 1.4; }
+.result-panel {
+  background: #F8F6F2;
+  border: 1.5px solid rgba(27,58,47,0.12);
+  border-radius: 14px;
+  padding: 20px 20px 18px;
+  transition: opacity 0.22s;
+  opacity: 0;
+  pointer-events: none;
+}
+.result-panel.visible { opacity: 1; pointer-events: auto; }
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.stat-block {
+  background: #1B3A2F;
+  border-radius: 12px;
+  padding: 12px 16px;
+  text-align: center;
+  flex-shrink: 0;
+  min-width: 90px;
+}
+.stat-number {
+  font-size: 22px;
+  font-weight: 700;
+  color: #D4A04A;
+  display: block;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+.stat-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.75);
+  display: block;
+  margin-top: 3px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.result-heading {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1B3A2F;
+  margin-bottom: 5px;
+}
+.result-copy {
+  font-size: 13px;
+  color: #4A5D53;
+  line-height: 1.6;
+}
+.divider {
+  border: none;
+  border-top: 1px solid rgba(27,58,47,0.1);
+  margin: 14px 0;
+}
+.initiatives { display: flex; flex-direction: column; gap: 10px; }
+.initiative-row { display: flex; align-items: flex-start; gap: 10px; }
+.initiative-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #D4A04A;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.initiative-text { font-size: 12px; color: #4A5D53; line-height: 1.5; }
+.initiative-text strong { color: #1B3A2F; font-weight: 700; }
+.result-cta {
+  display: inline-block;
+  background: #D4A04A;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 9px 18px;
+  border-radius: 20px;
+  transition: background 0.15s;
+  letter-spacing: 0.2px;
+  margin-top: 16px;
+}
+.result-cta:hover { background: #b8882e; }
+.reset-btn {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: #7A8B82;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 12px;
+  cursor: pointer;
+  padding: 4px;
+  font-family: inherit;
+}
+.reset-btn:hover { color: #1B3A2F; }
+@media (max-width: 380px) {
+  .cause-icon { font-size: 22px; }
+  .cause-label { font-size: 12px; }
+  .stat-number { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+ 
+<div class="widget" id="widget">
+  <h2 class="widget-heading">Your purchase gives back</h2>
+  <p class="widget-sub">Pick a cause to see Mood's impact</p>
+ 
+  <div class="cause-grid">
+    <div class="cause-card" data-cause="animals" role="button" tabindex="0" aria-label="Animals">
+      <span class="cause-icon">🐾</span>
+      <span class="cause-label">Animals</span>
+      <span class="cause-sub">Rescue & care</span>
+    </div>
+    <div class="cause-card" data-cause="hunger" role="button" tabindex="0" aria-label="Hunger relief">
+      <span class="cause-icon">🌾</span>
+      <span class="cause-label">Hunger</span>
+      <span class="cause-sub">Fighting food insecurity</span>
+    </div>
+    <div class="cause-card" data-cause="health" role="button" tabindex="0" aria-label="Health">
+      <span class="cause-icon">💚</span>
+      <span class="cause-label">Health</span>
+      <span class="cause-sub">Community wellness</span>
+    </div>
+  </div>
+ 
+  <div class="result-panel" id="result" role="region" aria-live="polite">
+    <div class="stat-row">
+      <div class="stat-block">
+        <span class="stat-number" id="stat-number"></span>
+        <span class="stat-label" id="stat-label"></span>
+      </div>
+      <div>
+        <p class="result-heading" id="result-heading"></p>
+        <p class="result-copy" id="result-copy"></p>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="initiatives" id="initiatives"></div>
+    <a class="result-cta" id="result-cta" href="https://mood.com/blog" target="_blank" rel="noopener">Read the full story</a>
+    <button class="reset-btn" id="reset-btn">Start over</button>
+  </div>
+</div>
+ 
+<script>
+var results = {
+  animals: {
+    statNumber: "$32.5K",
+    statLabel: "Donated",
+    heading: "Supporting animal rescue",
+    copy: "Mood has directed over $32,500 to animal rescue organizations across the country.",
+    initiatives: [
+      { strong: "$25,000 to Oklahoma City Humane Society", text: " — funding food, medical care, and spay and neuter services for thousands of animals annually." },
+      { strong: "$7,500 to Mercer Animal Rescue", text: " — supporting their Chicago-based mission to find loving homes for pets in need." },
+      { strong: "Mood Joint Dog Toy", text: " — a limited item where proceeds benefited the Charlotte Humane Society on National Dog Day." }
+    ],
+    cta: "Read about our animal donations",
+    url: "https://mood.com/blog"
+  },
+  hunger: {
+    statNumber: "100K",
+    statLabel: "Meals donated",
+    heading: "Fighting hunger across the U.S.",
+    copy: "In May 2024, Mood partnered with Conscious Alliance to donate 100,000 meals by moving 20 semi-trucks of rescued surplus food to families in need.",
+    initiatives: [
+      { strong: "Conscious Alliance partnership", text: " — redistributing excess grocery store items that would otherwise go to waste to underserved communities." },
+      { strong: "Ongoing commitment", text: " — the more Mood customers stock up, the more the brand can give back through initiatives like this." }
+    ],
+    cta: "Read about the Conscious Alliance partnership",
+    url: "https://mood.com/blog"
+  },
+  health: {
+    statNumber: "25%",
+    statLabel: "Order donated",
+    heading: "The Mood Mobile tour",
+    copy: "In spring 2025, Mood launched a cross-country fundraiser for the Colorectal Cancer Alliance, led by Operations Manager Chris after surviving stage 3 rectal cancer.",
+    initiatives: [
+      { strong: "Dollar-for-dollar match", text: " — for every dollar donated, Mood matches the amount in Loyalty Program points." },
+      { strong: "Code MOODTOUR", text: " — saves customers 20%, and Mood donates 25% of the order total to the Colorectal Cancer Alliance." },
+      { strong: "Community-first mission", text: " — the tour connects directly with customers across the country while raising cancer awareness." }
+    ],
+    cta: "Read about the Mood Mobile",
+    url: "https://mood.com/blog"
+  }
+};
+ 
+var cards = document.querySelectorAll('.cause-card');
+var panel = document.getElementById('result');
+var statNumberEl = document.getElementById('stat-number');
+var statLabelEl = document.getElementById('stat-label');
+var headingEl = document.getElementById('result-heading');
+var copyEl = document.getElementById('result-copy');
+var initiativesEl = document.getElementById('initiatives');
+var ctaEl = document.getElementById('result-cta');
+var resetBtn = document.getElementById('reset-btn');
+ 
+function selectCause(cause) {
+  cards.forEach(function(c) { c.classList.toggle('selected', c.dataset.cause === cause); });
+  var r = results[cause];
+  statNumberEl.textContent = r.statNumber;
+  statLabelEl.textContent = r.statLabel;
+  headingEl.textContent = r.heading;
+  copyEl.textContent = r.copy;
+  ctaEl.textContent = r.cta;
+  ctaEl.href = r.url;
+  initiativesEl.innerHTML = '';
+  r.initiatives.forEach(function(item) {
+    var row = document.createElement('div');
+    row.className = 'initiative-row';
+    var dot = document.createElement('div');
+    dot.className = 'initiative-dot';
+    var text = document.createElement('p');
+    text.className = 'initiative-text';
+    var strong = document.createElement('strong');
+    strong.textContent = item.strong;
+    text.appendChild(strong);
+    text.appendChild(document.createTextNode(item.text));
+    row.appendChild(dot);
+    row.appendChild(text);
+    initiativesEl.appendChild(row);
+  });
+  panel.classList.add('visible');
+  sendHeight();
+}
+ 
+function reset() {
+  cards.forEach(function(c) { c.classList.remove('selected'); });
+  panel.classList.remove('visible');
+  sendHeight();
+}
+ 
+cards.forEach(function(card) {
+  card.addEventListener('click', function() { selectCause(this.dataset.cause); });
+  card.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectCause(this.dataset.cause); }
+  });
+});
+ 
+resetBtn.addEventListener('click', reset);
+ 
+function sendHeight() {
+  setTimeout(function() {
+    var h = document.getElementById('widget').scrollHeight + 16;
+    window.parent.postMessage({ type: 'iframeHeight', height: h }, '*');
+  }, 50);
+}
+ 
+sendHeight();
+window.addEventListener('resize', sendHeight);
+</script>
+</body>
+</html>
